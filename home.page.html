@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Contactos</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar
+      [(ngModel)]="searchTerm"
+      placeholder="Buscar contacto"
+      showCancelButton="never"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Contactos Destacados -->
+  <ion-list *ngIf="contactosDestacados.length > 0" lines="inset">
+    <ion-list-header>
+      <ion-label>Destacados</ion-label>
+    </ion-list-header>
+
+    <ion-item *ngFor="let contacto of contactosDestacados" (click)="verInfo(contacto)">
+      <ion-label>{{ contacto.nombre }}</ion-label>
+      <ion-icon name="heart" slot="end" color="danger"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <!-- Todos los Contactos -->
+  <ion-list lines="inset">
+    <ion-list-header>
+      <ion-label>Todos</ion-label>
+    </ion-list-header>
+
+    <ion-item *ngFor="let contacto of filtrarContactos()" (click)="verInfo(contacto)">
+      <ion-label>
+        <h2>{{ contacto.nombre }}</h2>
+        <p *ngIf="contacto.numero">{{ contacto.numero }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- Botón flotante -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" (click)="abrirModalNuevoContacto()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

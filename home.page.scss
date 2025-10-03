@@ -1,0 +1,40 @@
+ion-searchbar {
+  margin: 8px auto;
+  border-radius: 20px;
+  max-width: 90%; /* más corto que la pantalla */
+  --background: #2c2c2e;
+  --color: #fff;
+  --placeholder-color: #aaa;
+  --icon-color: #aaa;
+  --border-radius: 12px;
+}
+
+ion-list {
+  margin: 10px;
+  border-radius: 16px;
+  background: #1c1c1e;
+}
+
+ion-list-header {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #aaa;
+}
+
+ion-item {
+  --padding-start: 16px;
+  --inner-padding-end: 10px;
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+/* Botón estilo iOS */
+ion-fab-button {
+  --background: #fff;
+  --color: #3880ff; /* azul iOS */
+  --border-radius: 50%;
+  --box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  width: 56px;
+  height: 56px;
+  font-size: 28px;
+}
