@@ -1,0 +1,91 @@
+<ion-header collapse="condense">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title size="large">{{ contact.name }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollEvents]="true" (ionScroll)="onScroll($event)" style="--background: #000; color: #fff; padding-bottom: 140px;">
+
+  <!-- Avatar y nombre -->
+  <div class="contact-header" [ngStyle]="{'transform': 'scale(' + avatarScale + ')'}">
+    <ion-avatar>
+      <img src="https://via.placeholder.com/150" alt="Foto del contacto" />
+    </ion-avatar>
+    <h2>{{ contact.name }}</h2>
+    <p>{{ contact.phone }}</p>
+  </div>
+
+  <!-- Botones principales -->
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-margin-bottom">
+      <ion-col size="4" class="ion-text-center">
+        <ion-button expand="full" color="success" (click)="goToLlamada()">
+          <ion-icon slot="start" name="call-outline"></ion-icon>
+          Llamar
+        </ion-button>
+      </ion-col>
+      <ion-col size="4" class="ion-text-center">
+        <ion-button expand="full" color="tertiary" (click)="goToChat()">
+          <ion-icon slot="start" name="chatbubbles-outline"></ion-icon>
+          Mensaje
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Registro de llamadas y mensajes -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Registro de llamadas</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list lines="none">
+        <ion-item *ngFor="let call of visibleCallLog" class="call-item">
+          <ion-icon slot="start" [name]="call.icon" [color]="call.color" class="call-icon"></ion-icon>
+          <div class="call-text">{{ call.text }}</div>
+        </ion-item>
+      </ion-list>
+      <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+        <ion-infinite-scroll-content
+          loadingSpinner="bubbles"
+          loadingText="Cargando más registros...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Botones flotantes -->
+  <div class="floating-buttons">
+    <ion-button fill="clear" class="favorite-btn" (click)="toggleFavorite()" [class.filled]="isFavorite">
+      <ion-icon [name]="isFavorite ? 'heart' : 'heart-outline'" color="danger"></ion-icon>
+    </ion-button>
+
+    <ion-button fill="clear" class="edit-btn" (click)="editContact()">
+      <ion-icon name="create-outline"></ion-icon>
+    </ion-button>
+
+    <ion-button fill="clear" class="share-btn" (click)="shareContact()">
+      <ion-icon name="qr-code-outline"></ion-icon>
+    </ion-button>
+
+    <ion-button fill="clear" class="more-btn" (click)="moreOptions()">
+      <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Menú Más funcional -->
+  <ion-action-sheet
+    [isOpen]="showMoreOptions"
+    (didDismiss)="showMoreOptions = false"
+    header="Opciones"
+    [buttons]="[
+      { text: 'Eliminar contacto', icon: 'trash-outline', handler: deleteContact },
+      { text: 'Bloquear contacto', icon: 'ban-outline', handler: blockContact },
+      { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
+    ]">
+  </ion-action-sheet>
+
+</ion-content>

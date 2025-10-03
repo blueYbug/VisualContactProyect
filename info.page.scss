@@ -1,0 +1,109 @@
+/* Fondo y padding general */
+ion-content {
+  --background: #000;
+  color: #fff;
+  padding-bottom: 140px; /* espacio para botones flotantes */
+}
+
+/* Cabecera del contacto */
+.contact-header {
+  text-align: center;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+
+  ion-avatar {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 15px auto;
+    border: 3px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease;
+  }
+
+  h2, p { color: #fff; }
+  h2 { margin: 0; font-size: 1.6rem; font-weight: 600; }
+  p { margin: 5px 0 0 0; font-size: 1rem; }
+}
+
+/* Botones generales */
+ion-button { 
+  --border-radius: 20px; 
+  transition: transform 0.2s ease; 
+}
+
+ion-button:active { transform: scale(0.95); }
+
+ion-button.filled ion-icon {
+  animation: fillHeart 0.3s forwards;
+}
+
+@keyframes fillHeart {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+/* Estilo de tarjetas */
+ion-card {
+  border-radius: 15px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  margin-bottom: 15px;
+  background-color: #111;
+}
+
+/* Registro de llamadas */
+.call-item {
+  border-radius: 12px;
+  margin-bottom: 8px;
+  padding: 10px 15px;
+  background-color: #222;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+
+.call-icon { font-size: 1.5rem; margin-right: 10px; }
+.call-text { font-size: 1rem; color: #fff; }
+
+/* Botones flotantes de acción */
+.floating-buttons {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 25px;
+  z-index: 100;
+}
+
+.floating-buttons ion-button {
+  --box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  background: #111;
+  color: #fff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.floating-buttons ion-button:active {
+  transform: scale(0.9);
+}
+
+/* Botones de acción principal estilo WhatsApp/iPhone */
+.action-btn {
+  --border-radius: 25px;
+  font-weight: 600;
+  --padding-start: 15px;
+  --padding-end: 15px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
