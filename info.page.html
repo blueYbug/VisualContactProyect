@@ -59,33 +59,47 @@
 
   <!-- Botones flotantes -->
   <div class="floating-buttons">
+    <!-- Favorito -->
     <ion-button fill="clear" class="favorite-btn" (click)="toggleFavorite()" [class.filled]="isFavorite">
       <ion-icon [name]="isFavorite ? 'heart' : 'heart-outline'" color="danger"></ion-icon>
     </ion-button>
 
+    <!-- Editar -->
     <ion-button fill="clear" class="edit-btn" (click)="editContact()">
       <ion-icon name="create-outline"></ion-icon>
     </ion-button>
 
-    <ion-button fill="clear" class="share-btn" (click)="shareContact()">
+    <!-- QR -->
+    <ion-button fill="clear" class="share-btn" (click)="showQR = true">
       <ion-icon name="qr-code-outline"></ion-icon>
     </ion-button>
 
+    <!-- Modal QR -->
+    <ion-modal [isOpen]="showQR" backdropDismiss="true" (didDismiss)="showQR = false">
+  <ion-content class="qr-modal-content">
+    <div class="qr-container">
+      <img *ngIf="qrImageUrl" [src]="qrImageUrl" alt="QR del contacto" />
+      <ion-button expand="block" color="light" (click)="showQR = false" class="close-qr-btn">
+        Cerrar
+      </ion-button>
+    </div>
+  </ion-content>
+</ion-modal>
+
+
+    <!-- Más opciones -->
     <ion-button fill="clear" class="more-btn" (click)="moreOptions()">
       <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
     </ion-button>
   </div>
 
   <!-- Menú Más funcional -->
-  <ion-action-sheet
-    [isOpen]="showMoreOptions"
-    (didDismiss)="showMoreOptions = false"
-    header="Opciones"
-    [buttons]="[
-      { text: 'Eliminar contacto', icon: 'trash-outline', handler: deleteContact },
-      { text: 'Bloquear contacto', icon: 'ban-outline', handler: blockContact },
-      { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
-    ]">
-  </ion-action-sheet>
+<ion-action-sheet
+  [isOpen]="showMoreOptions"
+  (didDismiss)="showMoreOptions = false"
+  header="Opciones"
+  [buttons]="buttons">
+</ion-action-sheet>
+
 
 </ion-content>

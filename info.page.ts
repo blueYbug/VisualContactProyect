@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, NavController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
+import * as QRCode from 'qrcode'; // <-- Importamos la librería qrcode
 
 interface CallLog {
   icon: string;
@@ -24,6 +25,13 @@ export class InfoPage implements OnInit {
   avatarScale = 1;
   showMoreOptions = false;
 
+  // 🔹 QR data y URL generada
+  qrData: string = '';
+  qrImageUrl: string = '';
+
+  // 🔹 Control modal QR
+  showQR: boolean = false;
+
   constructor(
     private alertCtrl: AlertController,
     private navCtrl: NavController,
@@ -35,6 +43,9 @@ export class InfoPage implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['nombre']) this.contact.name = params['nombre'];
       if (params['numero']) this.contact.phone = params['numero'];
+      // Generar QR con nombre y número
+      this.qrData = `${this.contact.name}|${this.contact.phone}`;
+      this.generateQR();
     });
 
     const fav = localStorage.getItem('favorite_' + this.contact.name);
@@ -48,6 +59,7 @@ export class InfoPage implements OnInit {
         text: i % 2 === 0 ? `Llamada simulada ${i}` : `Mensaje simulado ${i}`
       });
     }
+
     this.visibleCallLog = this.callLog.slice(0, this.batchSize);
   }
 
@@ -100,13 +112,31 @@ export class InfoPage implements OnInit {
     localStorage.setItem('favorite_' + this.contact.name, this.isFavorite ? '1' : '0');
   }
 
+  // 🔹 Eliminar contacto con confirmación y limpieza de localStorage
   async deleteContact() {
-    // eliminar contacto de localStorage
-    const contactos = JSON.parse(localStorage.getItem('contactos') || '[]');
-    const nuevos = contactos.filter((c: any) => c.nombre !== this.contact.name);
-    localStorage.setItem('contactos', JSON.stringify(nuevos));
-    // volver a HomePage
-    this.navCtrl.navigateBack('/home');
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar contacto',
+      message: `¿Seguro que deseas eliminar a <strong>${this.contact.name}</strong>?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          handler: () => {
+            const contactos = JSON.parse(localStorage.getItem('contactos') || '[]');
+            const nuevos = contactos.filter((c: any) => c.nombre !== this.contact.name);
+            localStorage.setItem('contactos', JSON.stringify(nuevos));
+
+            // Eliminar favorito si existía
+            localStorage.removeItem('favorite_' + this.contact.name);
+
+            // Volver al Home
+            this.navCtrl.navigateBack('/home');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   async editContact() {
@@ -118,8 +148,9 @@ export class InfoPage implements OnInit {
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        { text: 'Guardar', handler: (data) => { 
-            // actualizar contacto en memoria y en localStorage
+        {
+          text: 'Guardar',
+          handler: (data) => {
             const contactos = JSON.parse(localStorage.getItem('contactos') || '[]');
             const index = contactos.findIndex((c: any) => c.nombre === this.contact.name);
             if (index >= 0) {
@@ -127,23 +158,47 @@ export class InfoPage implements OnInit {
               localStorage.setItem('contactos', JSON.stringify(contactos));
               this.contact.name = data.name;
               this.contact.phone = data.phone;
+              this.qrData = `${data.name}|${data.phone}`; // actualizar QR
+              this.generateQR();
             }
-          } 
+          }
         }
       ]
     });
     await alert.present();
   }
 
-  async shareContact() {
-    const alert = await this.alertCtrl.create({
-      header: 'QR del contacto',
-      message: `<div style="text-align:center"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${this.contact.name} - ${this.contact.phone}" /></div>`,
-      buttons: ['Cerrar']
-    });
-    await alert.present();
-  }
-
   moreOptions() { this.showMoreOptions = true; }
   blockContact() { alert('Contacto bloqueado'); }
+
+  shareContact() {
+    this.showQR = true;
+  }
+
+  // 🔹 Método para generar QR con la librería 'qrcode'
+  async generateQR() {
+    try {
+      this.qrImageUrl = await QRCode.toDataURL(this.qrData, { errorCorrectionLevel: 'M', width: 250 });
+    } catch (err) {
+      console.error('Error generando QR:', err);
+    }
+  }
+  buttons = [
+  {
+    text: 'Eliminar contacto',
+    icon: 'trash-outline',
+    handler: () => this.deleteContact()
+  },
+  {
+    text: 'Bloquear contacto',
+    icon: 'ban-outline',
+    handler: () => this.blockContact()
+  },
+  {
+    text: 'Cancelar',
+    icon: 'close-outline',
+    role: 'cancel'
+  }
+];
+
 }
