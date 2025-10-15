@@ -1,0 +1,103 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Llamadas Recientes</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar
+      [(ngModel)]="searchTerm"
+      placeholder="Buscar registro"
+      showCancelButton="never"
+      class="recientes-searchbar">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollEvents]="true" (ionScroll)="onScroll($event)" class="recientes-page">
+
+  <!-- Skeleton Loader -->
+  <ng-container *ngIf="isLoading">
+    <ion-list>
+      <ion-item *ngFor="let i of [1,2,3,4,5]" lines="none">
+        <ion-skeleton-text animated style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px;"></ion-skeleton-text>
+        <ion-label>
+          <ion-skeleton-text animated style="width: 60%; margin-bottom: 6px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+        </ion-label>
+        <ion-skeleton-text animated style="width: 50px; height: 14px;"></ion-skeleton-text>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <!-- Lista de llamadas -->
+  <ion-list *ngIf="!isLoading" lines="none">
+    <ng-container *ngFor="let day of callLogByDay">
+      <!-- Separador de fecha -->
+      <ion-item-divider sticky>
+        {{ day.dateLabel }}
+      </ion-item-divider>
+
+      <!-- Llamadas del día -->
+      <ion-item-sliding *ngFor="let call of day.logs">
+        <ion-item class="call-item" [ngClass]="call.type">
+          <ion-icon slot="start" [name]="call.icon" [color]="call.color" class="call-icon"></ion-icon>
+          <ion-label>
+            <h3>{{ call.contactName || 'Desconocido' }}</h3>
+            <p>{{ call.phone || 'Sin número' }}</p>
+            <small>Tipo: {{ call.type }}</small>
+          </ion-label>
+          <div class="call-time">{{ call.time | date:'shortTime' }}</div>
+        </ion-item>
+
+        <!-- Opciones rápidas al deslizar -->
+        <ion-item-options side="end">
+          <ion-item-option color="success" (click)="callAgain(call)">
+            <ion-icon slot="icon-only" name="call-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="tertiary" (click)="viewCallDetails(call)">
+            <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ng-container>
+  </ion-list>
+
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Cargando más registros...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>
+
+<!-- ==============================
+     Barra de navegación inferior
+     ============================== -->
+<ion-footer>
+  <ion-toolbar>
+    <ion-grid>
+      <ion-row class="ion-justify-content-space-around ion-align-items-center">
+        <ion-col class="ion-text-center">
+          <ion-button fill="clear" [routerLink]="['/teclado']">
+            <ion-icon name="keypad-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <ion-button fill="clear" [routerLink]="['/recientes']" class="active">
+            <ion-icon name="time-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <ion-button fill="clear" [routerLink]="['/home']">
+            <ion-icon name="people-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-footer>
