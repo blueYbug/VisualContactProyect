@@ -1,40 +1,227 @@
-ion-searchbar {
+/* ==============================
+   Variables y adaptación modo claro/oscuro
+   ============================== */
+:root {
+  --bg-primary: #f2f2f7;
+  --bg-secondary: rgba(255, 255, 255, 0.85); /* Caja opaca */
+  --text-primary: #1c1c1e;
+  --text-secondary: #3c3c4399;
+  --btn-bg: #e0e0e0;
+  --btn-color: #1c1c1e;
+  --btn-hover: #d1d1d6;
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-shadow: rgba(0,0,0,0.1);
+  --icon-color: #3880ff;
+  --footer-bg: #ffffff;
+  --footer-icon-active: #3880ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #000000;
+    --bg-secondary: rgba(28,28,30,0.85);
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1a6;
+    --btn-bg: #2c2c2e;
+    --btn-color: #ffffff;
+    --btn-hover: #3a3a3c;
+    --card-bg: rgba(44,44,46,0.9);
+    --card-shadow: rgba(0,0,0,0.4);
+    --icon-color: #0abde3;
+    --footer-bg: #1c1c1e;
+    --footer-icon-active: #0abde3;
+  }
+}
+
+/* ==============================
+   Fondo general
+   ============================== */
+.home-page {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding-bottom: 80px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* ==============================
+   Searchbar
+   ============================== */
+ion-searchbar.home-searchbar {
   margin: 8px auto;
   border-radius: 20px;
-  max-width: 90%; /* más corto que la pantalla */
-  --background: #2c2c2e;
-  --color: #fff;
-  --placeholder-color: #aaa;
-  --icon-color: #aaa;
+  max-width: 90%;
+  --background: var(--bg-secondary);
+  --color: var(--text-primary);
+  --placeholder-color: var(--text-secondary);
+  --icon-color: var(--text-secondary);
   --border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-ion-list {
+/* ==============================
+   Listas de contactos
+   ============================== */
+.contact-list {
   margin: 10px;
   border-radius: 16px;
-  background: #1c1c1e;
+  background: var(--bg-secondary);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  backdrop-filter: blur(8px);
+  padding: 5px;
 }
 
+/* ==============================
+   List headers
+   ============================== */
 ion-list-header {
   font-size: 1rem;
   font-weight: bold;
-  color: #aaa;
+  color: var(--text-secondary);
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
+/* ==============================
+   Items de contacto
+   ============================== */
 ion-item {
   --padding-start: 16px;
   --inner-padding-end: 10px;
-  border-radius: 10px;
-  margin: 4px 0;
+  border-radius: 12px;
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
 }
 
-/* Botón estilo iOS */
-ion-fab-button {
-  --background: #fff;
-  --color: #3880ff; /* azul iOS */
-  --border-radius: 50%;
-  --box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  width: 56px;
-  height: 56px;
+ion-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* ==============================
+   Avatares
+   ============================== */
+.contact-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+  border: 2px solid var(--icon-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-avatar:hover,
+.contact-avatar:active {
+  transform: scale(1.15);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+
+/* ==============================
+   Botones de ícono
+   ============================== */
+ion-item ion-button.icon-button {
+  --background: transparent;
+  --box-shadow: none;
+  padding: 0;
+  margin-left: 6px;
+  margin-right: 0;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  transition: all 0.2s ease;
+}
+
+ion-item ion-button.icon-button ion-icon {
+  font-size: 22px;
+  color: var(--icon-color);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+ion-item ion-button.icon-button:hover ion-icon,
+ion-item ion-button.icon-button:active ion-icon {
+  transform: scale(1.2) rotate(10deg);
+  color: var(--btn-color);
+}
+
+/* ==============================
+   Botón flotante agregar
+   ============================== */
+ion-fab-button.add-btn {
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  box-shadow: 0 6px 18px var(--card-shadow);
+  transition: all 0.2s ease;
+}
+
+ion-fab-button.add-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 3px 10px var(--card-shadow);
+}
+
+/* ==============================
+   Separación visual entre destacados y todos
+   ============================== */
+.contact-list + .contact-list {
+  margin-top: 20px;
+}
+
+/* ==============================
+   Transiciones suaves
+   ============================== */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* ==============================
+   Barra de navegación inferior unificada
+   ============================== */
+.global-footer ion-toolbar {
+  --background: var(--footer-bg);
+  height: 60px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.global-footer ion-toolbar ion-button {
+  --background: transparent;
+  --color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  width: 60px;
+  height: 60px;
+  --ripple-color: var(--icon-color);
+  transition: all 0.2s ease;
+}
+
+.global-footer ion-toolbar ion-button ion-icon {
   font-size: 28px;
+  margin-bottom: 2px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.global-footer ion-toolbar ion-button:hover ion-icon,
+.global-footer ion-toolbar ion-button:active ion-icon {
+  transform: scale(1.2);
+  color: var(--footer-icon-active);
+}
+
+.global-footer ion-toolbar ion-button.active ion-icon {
+  color: var(--footer-icon-active);
+  transform: scale(1.3);
 }

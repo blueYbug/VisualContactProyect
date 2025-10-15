@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Contactos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirCamaraQR()">
+        <ion-icon name="qr-code-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 
   <ion-toolbar>
@@ -8,51 +13,100 @@
       [(ngModel)]="searchTerm"
       placeholder="Buscar contacto"
       showCancelButton="never"
+      class="home-searchbar"
     ></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="home-page">
   <!-- Contactos Destacados -->
-  <ion-list *ngIf="contactosDestacados.length > 0" lines="inset">
+  <ion-list *ngIf="contactosDestacados.length > 0" lines="inset" class="contact-list">
     <ion-list-header>
       <ion-label>Destacados</ion-label>
     </ion-list-header>
+    <ion-item *ngFor="let contacto of contactosDestacados" (press)="mostrarOpciones(contacto)">
+      <ion-avatar slot="start" class="contact-avatar">
+        <img *ngIf="contacto.photo; else placeholder" [src]="contacto.photo" />
+        <ng-template #placeholder>
+          <img src="assets/avatar-placeholder.png" />
+        </ng-template>
+      </ion-avatar>
 
-    <ion-item *ngFor="let contacto of contactosDestacados" (click)="verInfo(contacto)">
-      <ion-label>{{ contacto.nombre }}</ion-label>
-      <ion-icon name="heart" slot="end" color="danger"></ion-icon>
+      <ion-label (click)="verInfo(contacto)">
+        {{ contacto.nombre }}
+        <p *ngIf="contacto.numero">{{ contacto.numero }}</p>
+      </ion-label>
+
+      <ion-button slot="end" fill="clear" (click)="llamarContacto(contacto)" class="icon-button">
+        <ion-icon name="call-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button slot="end" fill="clear" (click)="mostrarOpciones(contacto)" class="icon-button">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 
   <!-- Todos los Contactos -->
-  <ion-list lines="inset">
+  <ion-list lines="inset" class="contact-list">
     <ion-list-header>
       <ion-label>Todos</ion-label>
     </ion-list-header>
+    <ion-item *ngFor="let contacto of filtrarContactos()" (press)="mostrarOpciones(contacto)">
+      <ion-avatar slot="start" class="contact-avatar">
+        <img *ngIf="contacto.photo; else placeholder2" [src]="contacto.photo" />
+        <ng-template #placeholder2>
+          <img src="assets/avatar-placeholder.png" />
+        </ng-template>
+      </ion-avatar>
 
-    <ion-item *ngFor="let contacto of filtrarContactos()" (click)="verInfo(contacto)">
-      <ion-label>
+      <ion-label (click)="verInfo(contacto)">
         <h2>{{ contacto.nombre }}</h2>
         <p *ngIf="contacto.numero">{{ contacto.numero }}</p>
       </ion-label>
+
+      <ion-button slot="end" fill="clear" (click)="llamarContacto(contacto)" class="icon-button">
+        <ion-icon name="call-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button slot="end" fill="clear" (click)="mostrarOpciones(contacto)" class="icon-button">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 
-  <!-- Botón flotante -->
+  <!-- Botón flotante para agregar nuevo contacto -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="primary" (click)="abrirModalNuevoContacto()">
+    <ion-fab-button class="add-btn" (click)="abrirModalNuevoContacto()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 </ion-content>
-<ion-header>
+
+<!-- ==============================
+     Barra de navegación inferior
+     ============================== -->
+<ion-footer>
   <ion-toolbar>
-    <ion-title>Contactos</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="abrirCamaraQR()">
-        <ion-icon name="qr-code-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ion-grid>
+      <ion-row class="ion-justify-content-space-around ion-align-items-center">
+        <ion-col class="ion-text-center">
+          <ion-button fill="clear" [routerLink]="['/teclado']">
+            <ion-icon name="keypad-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <ion-button fill="clear" [routerLink]="['/recientes']" class="active">
+            <ion-icon name="time-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <ion-button fill="clear" [routerLink]="['/home']">
+            <ion-icon name="people-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </ion-toolbar>
-</ion-header>
+</ion-footer>
+

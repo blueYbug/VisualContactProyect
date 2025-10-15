@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
-import { NavController, AlertController, ToastController, AnimationController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { NavController, AlertController, ToastController, AnimationController, ActionSheetController } from '@ionic/angular';
 import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
+import { DatabaseService, Contact } from '../../service/database.service';
 
 interface Contacto {
   nombre: string;
   numero?: string;
   destacado: boolean;
+  photo?: string; // <- agregado para avatar
 }
 
 @Component({
@@ -14,114 +16,131 @@ interface Contacto {
   styleUrls: ['./home.page.scss'],
   standalone: false
 })
-export class HomePage {
+export class HomePage implements OnInit {
   searchTerm: string = '';
   contactos: Contacto[] = [];
+
+  // Para controlar cuál botón de la barra está activo
+  activeTab: 'teclado' | 'recientes' | 'contactos' = 'contactos';
 
   constructor(
     private navCtrl: NavController,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
-    private animationCtrl: AnimationController
+    private animationCtrl: AnimationController,
+    private dbService: DatabaseService,
+    private actionSheetCtrl: ActionSheetController
   ) {}
 
-  // ✅ Se ejecuta al entrar a la vista
-  ionViewWillEnter() {
-    const stored = localStorage.getItem('contactos');
-    if (stored) {
-      this.contactos = JSON.parse(stored);
-    } else {
-      this.contactos = [
-        { nombre: 'Juan Pérez', numero: '123456789', destacado: true },
-        { nombre: 'Ana Torres', numero: '987654321', destacado: false },
-        { nombre: 'Carlos Díaz', numero: '555555555', destacado: false }
-      ];
-      localStorage.setItem('contactos', JSON.stringify(this.contactos));
-    }
+  ngOnInit() {
+    this.dbService.contactos$.subscribe((data: Contact[]) => {
+      this.contactos = data.map(c => ({
+        nombre: c.nombre,
+        numero: c.numero,
+        destacado: c.destacado,
+        photo: c.photo || ''
+      }));
 
-    // Actualizar destacados según localStorage
-    this.contactos.forEach(c => {
-      const fav = localStorage.getItem('favorite_' + c.nombre);
-      c.destacado = fav === '1';
+      this.contactos.sort((a, b) => (b.destacado ? 1 : 0) - (a.destacado ? 1 : 0));
     });
 
-    // Ordenar destacados primero
-    this.contactos.sort((a, b) => (b.destacado ? 1 : 0) - (a.destacado ? 1 : 0));
+    this.dbService.emitContactos();
   }
 
-  // ✅ Método para abrir la cámara y leer un código QR y guardar contacto
+  // ==============================
+// Funciones de navegación barra inferior
+// ==============================
+abrirTeclado() {
+  console.log('Teclado aún no implementado');
+}
+
+irRecientes() {
+  this.activeTab = 'recientes';
+  this.navCtrl.navigateForward('/recientes');
+}
+
+irContactos() {
+  this.activeTab = 'contactos';
+  this.navCtrl.navigateRoot('/home');
+}
+
+  // ==============================
+  // Escanear QR y agregar contacto
+  // ==============================
   async abrirCamaraQR() {
     try {
       const { barcodes } = await BarcodeScanner.scan();
 
-      if (barcodes.length > 0) {
-        const rawValue = barcodes[0].rawValue;
-        // ⚡ Parseamos nombre y número
-        const [nombre, numero] = rawValue.split('|');
-
-        if (nombre) {
-          // Verificar si ya existe
-          const existe = this.contactos.some(c => c.nombre === nombre);
-          if (!existe) {
-            const nuevoContacto: Contacto = {
-              nombre: nombre,
-              numero: numero || '',
-              destacado: false
-            };
-            this.contactos.push(nuevoContacto);
-            localStorage.setItem('contactos', JSON.stringify(this.contactos));
-
-            const toast = await this.toastCtrl.create({
-              message: `Contacto ${nombre} agregado correctamente.`,
-              duration: 2000,
-              color: 'success',
-              position: 'top'
-            });
-            await toast.present();
-          } else {
-            const toast = await this.toastCtrl.create({
-              message: `El contacto ${nombre} ya existe.`,
-              duration: 2000,
-              color: 'warning',
-              position: 'top'
-            });
-            await toast.present();
-          }
-        }
-      } else {
+      if (!barcodes || barcodes.length === 0) {
         const toast = await this.toastCtrl.create({
           message: 'No se detectó ningún código.',
           duration: 2000,
-          color: 'danger',
-          position: 'top'
+          color: 'danger'
+        });
+        await toast.present();
+        return;
+      }
+
+      const rawValue = barcodes[0].rawValue;
+      const [nombre, numero] = rawValue.split('|').map(s => s.trim());
+
+      if (!nombre || !numero) return;
+
+      if (!/^[a-zA-Z\s]+$/.test(nombre)) {
+        const toast = await this.toastCtrl.create({
+          message: 'Nombre inválido. Solo se permiten letras.',
+          duration: 2500,
+          color: 'warning'
+        });
+        await toast.present();
+        return;
+      }
+
+      if (!/^569\d{8}$/.test(numero) && !/^9\d{8}$/.test(numero)) {
+        const toast = await this.toastCtrl.create({
+          message: 'Número inválido. Debe ser un número chileno válido (569XXXXXXXX o 9XXXXXXXX).',
+          duration: 3000,
+          color: 'warning'
+        });
+        await toast.present();
+        return;
+      }
+
+      let numeroFinal = numero;
+      if (/^9\d{8}$/.test(numero)) numeroFinal = '569' + numero;
+
+      const existing = (await this.dbService.getContacts()).find(c => c.nombre === nombre);
+      if (existing) {
+        const toast = await this.toastCtrl.create({
+          message: `El contacto ${nombre} ya existe.`,
+          duration: 2000,
+          color: 'warning'
+        });
+        await toast.present();
+      } else {
+        await this.dbService.addOrUpdateContact(nombre, numeroFinal, false, '');
+        const toast = await this.toastCtrl.create({
+          message: `Contacto ${nombre} agregado correctamente.`,
+          duration: 2000,
+          color: 'success'
         });
         await toast.present();
       }
+
     } catch (err) {
       console.error('Error leyendo QR:', err);
+      const toast = await this.toastCtrl.create({
+        message: 'Error al leer el QR.',
+        duration: 2000,
+        color: 'danger'
+      });
+      await toast.present();
     }
   }
 
-  // ✅ Getter para contactos destacados
-  get contactosDestacados(): Contacto[] {
-    return this.contactos.filter(c => c.destacado);
-  }
-
-  // ✅ Filtro de búsqueda
-  filtrarContactos(): Contacto[] {
-    return this.contactos
-      .filter(c => c.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()))
-      .sort((a, b) => a.nombre.localeCompare(b.nombre));
-  }
-
-  // ✅ Navegar a vista de información
-  verInfo(contacto: Contacto) {
-    this.navCtrl.navigateForward('/info', {
-      queryParams: { nombre: contacto.nombre, numero: contacto.numero }
-    });
-  }
-
-  // ✅ Modal para agregar nuevo contacto
+  // ==============================
+  // Modal para crear contacto manualmente
+  // ==============================
   async abrirModalNuevoContacto() {
     const alert = await this.alertCtrl.create({
       header: 'Nuevo Contacto',
@@ -134,28 +153,52 @@ export class HomePage {
         {
           text: 'Guardar',
           handler: async (data) => {
-            if (data.numero && !/^\d+$/.test(data.numero)) {
+            const nombre = data.nombre?.trim();
+            let numero = data.numero?.trim();
+
+            if (!nombre || !numero) return false;
+
+            if (!/^[a-zA-Z\s]+$/.test(nombre)) {
               const toast = await this.toastCtrl.create({
-                message: 'Solo números, por favor.',
-                duration: 2000,
-                color: 'danger',
-                position: 'top'
+                message: 'Nombre inválido. Solo se permiten letras.',
+                duration: 2500,
+                color: 'warning'
               });
               await toast.present();
               return false;
             }
 
-            if (data.nombre) {
-              this.contactos.push({
-                nombre: data.nombre,
-                numero: data.numero,
-                destacado: false
+            if (!/^569\d{8}$/.test(numero) && !/^9\d{8}$/.test(numero)) {
+              const toast = await this.toastCtrl.create({
+                message: 'Número inválido. Debe ser un número chileno válido (569XXXXXXXX o 9XXXXXXXX).',
+                duration: 3000,
+                color: 'warning'
               });
-              localStorage.setItem('contactos', JSON.stringify(this.contactos));
-              return true;
+              await toast.present();
+              return false;
             }
 
-            return false;
+            if (/^9\d{8}$/.test(numero)) numero = '569' + numero;
+
+            const existing = (await this.dbService.getContacts()).find(c => c.nombre === nombre);
+            if (existing) {
+              const toast = await this.toastCtrl.create({
+                message: `El contacto ${nombre} ya existe.`,
+                duration: 2000,
+                color: 'warning'
+              });
+              await toast.present();
+              return false;
+            }
+
+            await this.dbService.addOrUpdateContact(nombre, numero, false, '');
+            const toast = await this.toastCtrl.create({
+              message: `Contacto ${nombre} agregado correctamente.`,
+              duration: 2000,
+              color: 'success'
+            });
+            await toast.present();
+            return true;
           }
         }
       ],
@@ -166,7 +209,34 @@ export class HomePage {
     await alert.present();
   }
 
-  // ✅ Animaciones personalizadas
+  // ==============================
+  // Navegar a InfoPage
+  // ==============================
+  verInfo(contacto: Contacto) {
+    this.navCtrl.navigateForward('/info', {
+      queryParams: { nombre: contacto.nombre, numero: contacto.numero }
+    });
+  }
+
+  // ==============================
+  // Filtro de búsqueda
+  // ==============================
+  filtrarContactos(): Contacto[] {
+    return this.contactos
+      .filter(c => c.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }
+
+  // ==============================
+  // Contactos destacados
+  // ==============================
+  get contactosDestacados(): Contacto[] {
+    return this.contactos.filter(c => c.destacado);
+  }
+
+  // ==============================
+  // Animaciones de modal
+  // ==============================
   enterAnimation(baseEl: any) {
     const backdropAnimation = this.animationCtrl
       .create()
@@ -192,4 +262,80 @@ export class HomePage {
   leaveAnimation(baseEl: any) {
     return this.enterAnimation(baseEl).direction('reverse');
   }
+
+  // ==============================
+  // Llamar directamente a un contacto
+  // ==============================
+  llamarContacto(contacto: Contacto) {
+    if (!contacto.numero) {
+      this.toastCtrl.create({
+        message: `El contacto ${contacto.nombre} no tiene número.`,
+        duration: 2000,
+        color: 'danger'
+      }).then(toast => toast.present());
+      return;
+    }
+
+    let numero = contacto.numero;
+    if (!numero.startsWith('+56')) {
+      if (numero.startsWith('0')) numero = '+56' + numero.slice(1);
+      else numero = '+56' + numero;
+    }
+
+    window.open(`tel:${numero}`, '_system');
+  }
+
+  // ==============================
+  // Mostrar opciones al mantener presionado un contacto
+  // ==============================
+  async mostrarOpciones(contacto: Contacto) {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: contacto.nombre,
+      buttons: [
+        {
+          text: contacto.destacado ? 'Quitar de destacados' : 'Destacar',
+          icon: 'star',
+          handler: async () => {
+            await this.dbService.addOrUpdateContact(
+              contacto.nombre,
+              contacto.numero || '',
+              !contacto.destacado,
+              contacto.photo || ''
+            );
+            const toast = await this.toastCtrl.create({
+              message: contacto.destacado
+                ? `${contacto.nombre} ya no está destacado.`
+                : `${contacto.nombre} destacado.`,
+              duration: 2000,
+              color: 'success'
+            });
+            await toast.present();
+          }
+        },
+        {
+          text: 'Eliminar',
+          icon: 'trash',
+          role: 'destructive',
+          handler: async () => {
+            await this.dbService.deleteContact(contacto.nombre);
+            const toast = await this.toastCtrl.create({
+              message: `Contacto ${contacto.nombre} eliminado.`,
+              duration: 2000,
+              color: 'danger'
+            });
+            await toast.present();
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+
 }
