@@ -1,134 +1,294 @@
-/* Fondo y padding general */
-ion-content {
-  --background: #000;
-  color: #fff;
-  padding-bottom: 140px; /* espacio para botones flotantes */
+/* ==============================
+   Variables y modo claro/oscuro
+   ============================== */
+:root {
+  --bg-primary: #f2f2f7;
+  --bg-secondary: rgba(255,255,255,0.95); /* un poco menos transparente */
+  --text-primary: #1c1c1e;
+  --text-secondary: #3c3c4399;
+  --btn-bg: #007aff;
+  --btn-color: #fff;
+  --btn-hover: #0051c7;
+  --card-bg: rgba(255,255,255,0.95);
+  --card-shadow: rgba(0,0,0,0.1);
 }
 
-/* Cabecera del contacto */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #000000;
+    --bg-secondary: rgba(28,28,30,0.95);
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1a6;
+    --btn-bg: #0a84ff;
+    --btn-color: #fff;
+    --btn-hover: #0051c7;
+    --card-bg: rgba(44,44,46,0.95);
+    --card-shadow: rgba(0,0,0,0.4);
+  }
+}
+
+/* ==============================
+   Fondo general
+   ============================== */
+ion-content {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding-bottom: 140px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* ==============================
+   Cabecera contacto
+   ============================== */
 .contact-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   transition: transform 0.3s ease;
-
-  ion-avatar {
-    width: 140px;
-    height: 140px;
-    margin: 0 auto 15px auto;
-    border: 3px solid #ddd;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    transition: transform 0.3s ease;
-  }
-
-  h2, p { color: #fff; }
-  h2 { margin: 0; font-size: 1.6rem; font-weight: 600; }
-  p { margin: 5px 0 0 0; font-size: 1rem; }
 }
 
-/* Botones generales */
-ion-button { 
-  --border-radius: 20px; 
-  transition: transform 0.2s ease; 
+.contact-header ion-avatar {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 15px auto;
+  border-radius: 50%;
+  border: 3px solid var(--btn-bg);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-ion-button:active { transform: scale(0.95); }
-
-ion-button.filled ion-icon {
-  animation: fillHeart 0.3s forwards;
+.contact-header ion-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
-@keyframes fillHeart {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.4); }
-  100% { transform: scale(1); }
+.contact-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-/* Estilo de tarjetas */
-ion-card {
-  border-radius: 15px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  margin-bottom: 15px;
-  background-color: #111;
+.contact-header p {
+  margin: 6px 0 0 0;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
 }
 
-/* Registro de llamadas */
-.call-item {
-  border-radius: 12px;
-  margin-bottom: 8px;
-  padding: 10px 15px;
-  background-color: #222;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease;
+/* ==============================
+   Botón principal de llamada
+   ============================== */
+.call-button {
+  --border-radius: 30px;
+  --background: var(--btn-bg);
+  --color: var(--btn-color);
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 14px 0;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
 }
 
-.call-icon { font-size: 1.5rem; margin-right: 10px; }
-.call-text { font-size: 1rem; color: #fff; }
+.call-button:hover {
+  filter: brightness(1.05);
+}
 
-/* Botones flotantes de acción */
+.call-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+/* ==============================
+   Botones flotantes
+   ============================== */
 .floating-buttons {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 25px;
+  gap: 18px;
   z-index: 100;
 }
 
 .floating-buttons ion-button {
-  --box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  background: #111;
-  color: #fff;
-  border-radius: 50%;
   width: 60px;
   height: 60px;
+  border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.2s ease;
+  background: var(--btn-bg); /* ahora más sólido */
+  color: var(--btn-color);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transition: all 0.25s ease;
+}
+
+.floating-buttons ion-button:hover {
+  filter: brightness(1.1);
 }
 
 .floating-buttons ion-button:active {
   transform: scale(0.9);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* Botones de acción principal estilo WhatsApp/iPhone */
-.action-btn {
-  --border-radius: 25px;
-  font-weight: 600;
-  --padding-start: 15px;
-  --padding-end: 15px;
-  --padding-top: 10px;
-  --padding-bottom: 10px;
-  --box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease;
-}
-
-.action-btn:active {
-  transform: scale(0.95);
-}
-/* Modal QR */
-.qr-modal-content {
+/* ==============================
+   Tarjetas y registro de llamadas
+   ============================== */
+.call-item {
+  border-radius: 18px;
+  margin-bottom: 10px;
+  padding: 14px 18px;
+  background-color: var(--bg-secondary);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
   display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center;     /* Centra verticalmente */
-  height: 100%;            /* Ocupa todo el alto del modal */
-  padding: 20px;
+  flex-direction: column;
+  transition: all 0.3s ease;
 }
 
-.qr-container {
+.call-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+}
+
+.call-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.call-icon {
+  font-size: 1.6rem;
+  margin-right: 14px;
+  color: var(--btn-bg);
+}
+
+.call-text {
+  font-size: 1rem;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+/* Fecha de la llamada */
+.call-date-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-left: 30px;
+}
+
+/* Hora de la llamada */
+.call-time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-left: 30px;
+}
+
+/* ==============================
+   Blur overlay
+   ============================== */
+.blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(15px);
+  background-color: rgba(0,0,0,0.15);
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* ==============================
+   QR overlay
+   ============================== */
+.qr-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(14px);
+  background: rgba(0,0,0,0.18);
+  z-index: 9999;
+}
+
+.qr-box {
+  background: var(--card-bg);
+  border-radius: 28px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px; /* Separación entre QR y botón */
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+  animation: zoomIn 0.3s ease;
 }
 
+.qr-image {
+  width: 180px;
+  height: 180px;
+  border-radius: 22px;
+  animation: focusIn 0.4s ease forwards;
+}
 
-.close-qr-btn {
-  margin-top: 15px;
-  --border-radius: 20px;
-  --padding-start: 20px;
-  --padding-end: 20px;
-  --padding-top: 10px;
-  --padding-bottom: 10px;
+.close-btn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  --background: transparent;
+}
+
+.close-btn ion-icon {
+  font-size: 28px;
+  color: var(--text-primary);
+  filter: drop-shadow(0 0 5px rgba(0,0,0,0.4));
+}
+
+/* ==============================
+   Avatar ampliado (preview)
+   ============================== */
+.avatar-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(12px) brightness(0.8);
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.avatar-large {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+  animation: zoomIn 0.3s ease;
+}
+
+/* ==============================
+   Animaciones
+   ============================== */
+@keyframes zoomIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+* {
+  transition: all 0.25s ease-in-out;
 }

@@ -7,47 +7,64 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [scrollEvents]="true" (ionScroll)="onScroll($event)" style="--background: #000; color: #fff; padding-bottom: 140px;">
+<ion-content [scrollEvents]="true" (ionScroll)="onScroll($event)" class="contact-page">
 
   <!-- Avatar y nombre -->
   <div class="contact-header" [ngStyle]="{'transform': 'scale(' + avatarScale + ')'}">
-    <ion-avatar>
-      <img src="https://via.placeholder.com/150" alt="Foto del contacto" />
+    <ion-avatar
+      (mousedown)="onAvatarPressStart()"
+      (mouseup)="onAvatarPressEnd()"
+      (mouseleave)="onAvatarPressEnd()"
+      (touchstart)="onAvatarPressStart()"
+      (touchend)="onAvatarPressEnd()"
+      (click)="changeAvatar()">
+      <img [src]="contact.photo || 'https://via.placeholder.com/150'" alt="Foto del contacto" />
     </ion-avatar>
     <h2>{{ contact.name }}</h2>
     <p>{{ contact.phone }}</p>
   </div>
 
-  <!-- Botones principales -->
+  <!-- Botón principal de llamada -->
   <ion-grid>
     <ion-row class="ion-justify-content-center ion-margin-bottom">
       <ion-col size="4" class="ion-text-center">
-        <ion-button expand="full" color="success" (click)="goToLlamada()">
-          <ion-icon slot="start" name="call-outline"></ion-icon>
+        <ion-button expand="full" class="call-btn" (click)="callContact()">
           Llamar
-        </ion-button>
-      </ion-col>
-      <ion-col size="4" class="ion-text-center">
-        <ion-button expand="full" color="tertiary" (click)="goToChat()">
-          <ion-icon slot="start" name="chatbubbles-outline"></ion-icon>
-          Mensaje
         </ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
 
-  <!-- Registro de llamadas y mensajes -->
+  <!-- Registro de llamadas mejorado -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Registro de llamadas</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-list lines="none">
-        <ion-item *ngFor="let call of visibleCallLog" class="call-item">
-          <ion-icon slot="start" [name]="call.icon" [color]="call.color" class="call-icon"></ion-icon>
-          <div class="call-text">{{ call.text }}</div>
-        </ion-item>
+        <ng-container *ngFor="let day of callLogByDay">
+          <!-- Separador de fecha -->
+          <ion-item-divider sticky>
+            {{ day.dateLabel }}
+          </ion-item-divider>
+
+          <!-- Llamadas del día -->
+          <ion-item *ngFor="let call of day.logs" class="call-item" [ngClass]="call.type">
+            <ion-icon 
+              slot="start" 
+              [name]="call.icon" 
+              [color]="call.color" 
+              class="call-icon">
+            </ion-icon>
+            <div class="call-text">
+              {{ call.text }}
+              <span *ngIf="call.duration">({{ call.duration }}s)</span>
+            </div>
+            <div class="call-time">{{ call.time }}</div>
+          </ion-item>
+        </ng-container>
       </ion-list>
+
       <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
         <ion-infinite-scroll-content
           loadingSpinner="bubbles"
@@ -59,47 +76,62 @@
 
   <!-- Botones flotantes -->
   <div class="floating-buttons">
-    <!-- Favorito -->
     <ion-button fill="clear" class="favorite-btn" (click)="toggleFavorite()" [class.filled]="isFavorite">
       <ion-icon [name]="isFavorite ? 'heart' : 'heart-outline'" color="danger"></ion-icon>
     </ion-button>
 
-    <!-- Editar -->
     <ion-button fill="clear" class="edit-btn" (click)="editContact()">
       <ion-icon name="create-outline"></ion-icon>
     </ion-button>
 
-    <!-- QR -->
     <ion-button fill="clear" class="share-btn" (click)="showQR = true">
       <ion-icon name="qr-code-outline"></ion-icon>
     </ion-button>
 
-    <!-- Modal QR -->
-    <ion-modal [isOpen]="showQR" backdropDismiss="true" (didDismiss)="showQR = false">
-  <ion-content class="qr-modal-content">
-    <div class="qr-container">
-      <img *ngIf="qrImageUrl" [src]="qrImageUrl" alt="QR del contacto" />
-      <ion-button expand="block" color="light" (click)="showQR = false" class="close-qr-btn">
-        Cerrar
-      </ion-button>
-    </div>
-  </ion-content>
-</ion-modal>
-
-
-    <!-- Más opciones -->
     <ion-button fill="clear" class="more-btn" (click)="moreOptions()">
       <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
     </ion-button>
   </div>
 
-  <!-- Menú Más funcional -->
-<ion-action-sheet
-  [isOpen]="showMoreOptions"
-  (didDismiss)="showMoreOptions = false"
-  header="Opciones"
-  [buttons]="buttons">
-</ion-action-sheet>
+  <!-- Blur solo para editar y opciones -->
+  <div class="blur-overlay" *ngIf="showEdit || showMoreOptions"></div>
 
+  <!-- QR flotante centrado -->
+  <div class="qr-overlay" *ngIf="showQR" (click)="showQR = false">
+    <div class="qr-box" (click)="$event.stopPropagation()">
+      <img *ngIf="qrImageUrl" [src]="qrImageUrl" alt="QR del contacto" class="qr-image" />
+      <ion-button fill="clear" class="close-btn" (click)="showQR = false">
+        <ion-icon name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Vista ampliada del avatar -->
+  <div class="avatar-preview" *ngIf="showAvatarPreview" (click)="closeAvatarPreview()">
+    <img [src]="avatarPreviewUrl" class="avatar-large" alt="Vista ampliada del contacto" />
+  </div>
+
+  <!-- Menú Más funcional -->
+  <ion-action-sheet
+    [isOpen]="showMoreOptions"
+    (didDismiss)="showMoreOptions = false"
+    header="Opciones"
+    [buttons]="buttons">
+  </ion-action-sheet>
+  <!-- Skeleton loader mientras carga -->
+      <ng-container *ngIf="!callLogByDay || callLogByDay.length === 0">
+        <ion-item *ngFor="let n of [1,2,3,4,5]" class="call-item">
+          <ion-avatar slot="start">
+            <ion-skeleton-text animated style="width: 40px; height: 40px; border-radius: 50%;"></ion-skeleton-text>
+          </ion-avatar>
+          <div class="call-text" style="flex:1; margin-left:10px;">
+            <ion-skeleton-text animated style="width: 80%; height: 14px; margin-bottom:6px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+          </div>
+          <div class="call-time">
+            <ion-skeleton-text animated style="width: 30px; height: 12px;"></ion-skeleton-text>
+          </div>
+        </ion-item>
+      </ng-container>
 
 </ion-content>
