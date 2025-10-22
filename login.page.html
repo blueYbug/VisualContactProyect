@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Bienvenido a Visual Contact</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding login-content">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Iniciar Sesión</ion-card-title>
+    </ion-card-header>
+
+    <ion-item>
+      <ion-label position="floating">Usuario</ion-label>
+      <ion-input [(ngModel)]="usuario" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input [(ngModel)]="contrasena" type="password"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none" class="ion-margin-top">
+      <ion-label>Mantener sesión iniciada</ion-label>
+      <ion-toggle [(ngModel)]="recordarme" color="success" slot="end"></ion-toggle>
+    </ion-item>
+
+    <div *ngIf="error" class="error-msg">
+      {{ error }}
+    </div>
+
+    <ion-button expand="block" (click)="iniciarSesion()">Entrar</ion-button>
+    
+    <div class="ion-text-center ion-margin-top">
+        <p>O inicia sesión con:</p>
+        <ion-button 
+            expand="block" 
+            color="danger" 
+            (click)="googleLogin()" 
+            class="google-btn"
+        >
+            <ion-icon name="logo-google" slot="start"></ion-icon>
+            Google
+        </ion-button>
+    </div>
+    <p class="ion-text-center ion-margin-top">
+        ¿No tienes cuenta?
+        <ion-button fill="clear" size="small" [routerLink]="['/registro']">
+          Regístrate aquí
+        </ion-button>
+    </p>
+
+  </ion-card>
+</ion-content>
