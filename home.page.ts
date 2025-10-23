@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController, ToastController, AnimationController, ActionSheetController } from '@ionic/angular';
 import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { DatabaseService, Contact } from '../../service/database.service';
+import { Geolocation } from '@capacitor/geolocation';  // Importamos el plugin para obtener la ubicación
+import { Share } from '@capacitor/share';
 
 interface Contacto {
   nombre: string;
@@ -19,9 +21,42 @@ interface Contacto {
 export class HomePage implements OnInit {
   searchTerm: string = '';
   contactos: Contacto[] = [];
+  isModalOpen: boolean = false;
+  isLocationSharingActive: boolean = false;
 
   // Para controlar cuál botón de la barra está activo
   activeTab: 'teclado' | 'recientes' | 'contactos' = 'contactos';
+
+  // Agregar la propiedad buttons para el ActionSheet
+  buttons = [
+    {
+      text: 'Destacar',
+      handler: () => {
+        // Acción para destacar
+      }
+    },
+    {
+      text: 'Eliminar',
+      role: 'destructive',
+      handler: () => {
+        // Acción para eliminar
+      }
+    },
+    {
+      text: 'Compartir ubicación',
+      handler: () => {
+        // Acción para compartir ubicación
+        this.shareLocation();
+      }
+    },
+    {
+      text: 'Cancelar',
+      role: 'cancel',
+      handler: () => {
+        // Acción de cancelar
+      }
+    }
+  ];
 
   constructor(
     private navCtrl: NavController,
@@ -48,27 +83,44 @@ export class HomePage implements OnInit {
   }
 
   // ==============================
-// Funciones de navegación barra inferior
-// ==============================
-abrirTeclado() {
-  console.log('Teclado aún no implementado');
-}
+  // Funciones de navegación barra inferior
+  // ==============================
+  abrirTeclado() {
+    console.log('Teclado aún no implementado');
+  }
 
-irRecientes() {
-  this.activeTab = 'recientes';
-  this.navCtrl.navigateForward('/recientes');
-}
+  irRecientes() {
+    this.activeTab = 'recientes';
+    this.navCtrl.navigateForward('/recientes');
+  }
 
-irContactos() {
-  this.activeTab = 'contactos';
-  this.navCtrl.navigateRoot('/home');
-}
+  irContactos() {
+    this.activeTab = 'contactos';
+    this.navCtrl.navigateRoot('/home');
+  }
 
   // ==============================
-  // Escanear QR y agregar contacto
+  // Escanear QR y agregar contacto (ajustada para Android 12)
   // ==============================
   async abrirCamaraQR() {
     try {
+      // 1. Verificar y solicitar permisos antes de usar la cámara
+      const status = await BarcodeScanner.checkPermissions();
+
+      if (status.camera !== 'granted') {
+        const permission = await BarcodeScanner.requestPermissions();
+        if (permission.camera !== 'granted') {
+          const toast = await this.toastCtrl.create({
+            message: 'Permiso de cámara denegado. Actívalo en Ajustes > Aplicaciones > Visual Contact.',
+            duration: 3000,
+            color: 'danger'
+          });
+          await toast.present();
+          return;
+        }
+      }
+
+      // 2. Escanear el código
       const { barcodes } = await BarcodeScanner.scan();
 
       if (!barcodes || barcodes.length === 0) {
@@ -246,9 +298,9 @@ irContactos() {
     const wrapperAnimation = this.animationCtrl
       .create()
       .addElement(baseEl.querySelector('.alert-wrapper'))
-      .keyframes([
-        { offset: 0, opacity: '0', transform: 'scale(0.9)' },
-        { offset: 1, opacity: '1', transform: 'scale(1)' }
+      .keyframes([ 
+        { offset: 0, opacity: '0', transform: 'scale(0.9)' }, 
+        { offset: 1, opacity: '1', transform: 'scale(1)' } 
       ]);
 
     return this.animationCtrl
@@ -337,5 +389,83 @@ irContactos() {
     await actionSheet.present();
   }
 
+  // ==============================
+  // Navegar a ConfigPage
+  // ==============================
+  irConfig() {
+    this.navCtrl.navigateForward('/config');
+  }
 
+  // ==============================
+  // Cerrar el modal
+  // ==============================
+  closeModal() {
+    this.isModalOpen = false;
+  }
+
+ // ==============================
+// Compartir ubicación (con geolocalización real)
+// ==============================
+async shareLocation() {
+  this.isLocationSharingActive = true; // Activar el overlay de difuminado
+  const actionSheet = await this.actionSheetCtrl.create({
+    header: 'Compartir Ubicación',
+    buttons: [
+      {
+        text: 'Copiar al portapapeles',
+        icon: 'clipboard',
+        handler: () => {
+          this.copyLocation();
+        },
+      },
+      {
+        text: 'Compartir',
+        icon: 'share-social',  // Ícono de compartir
+        handler: () => {
+          this.shareViaSocial();
+        },
+      },
+      {
+        text: 'Cancelar',
+        icon: 'close',
+        role: 'cancel',
+      },
+    ],
+  });
+  await actionSheet.present();
+}
+
+async getCurrentLocation() {
+  try {
+    const position = await Geolocation.getCurrentPosition();
+    return `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
+  } catch (error) {
+    console.error('Error obteniendo la ubicación', error);
+    return null;
+  }
+}
+
+async shareViaSocial() {
+  const locationUrl = await this.getCurrentLocation();
+  if (locationUrl) {
+    await Share.share({
+      title: 'Compartir ubicación',
+      text: 'Mira mi ubicación',
+      url: locationUrl,
+      dialogTitle: 'Compartir en Redes Sociales',
+    });
+  }
+}
+
+async copyLocation() {
+  const locationUrl = await this.getCurrentLocation();
+  if (locationUrl) {
+    await navigator.clipboard.writeText(locationUrl);
+    alert('¡Ubicación copiada al portapapeles!');
+  }
+}
+
+
+
+  
 }

@@ -5,6 +5,14 @@
       <ion-button (click)="abrirCamaraQR()">
         <ion-icon name="qr-code-outline"></ion-icon>
       </ion-button>
+      <!-- Botón de compartir ubicación (ahora en el medio) -->
+      <ion-button (click)="shareLocation()" class="location-button">
+        <ion-icon name="location-outline"></ion-icon>
+      </ion-button>
+      <!-- Botón de configuración (ahora al final) -->
+      <ion-button (click)="irConfig()">
+        <ion-icon name="settings-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 
@@ -19,6 +27,9 @@
 </ion-header>
 
 <ion-content class="home-page">
+  <!-- El overlay de difuminado cuando el botón de compartir ubicación se activa -->
+  <div *ngIf="isLocationSharingActive" class="share-location-overlay"></div>
+
   <!-- Contactos Destacados -->
   <ion-list *ngIf="contactosDestacados.length > 0" lines="inset" class="contact-list">
     <ion-list-header>
@@ -110,3 +121,9 @@
   </ion-toolbar>
 </ion-footer>
 
+<!-- Modal de opciones para los contactos -->
+<ion-action-sheet
+  [isOpen]="isModalOpen"
+  [buttons]="buttons"
+  (ionActionSheetDidDismiss)="closeModal()">
+</ion-action-sheet>
