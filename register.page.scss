@@ -1,0 +1,124 @@
+/* ==============================
+   Variables y adaptación modo claro/oscuro
+   ============================== */
+:root {
+  --bg-primary: #f2f2f7;
+  --bg-secondary: rgba(255, 255, 255, 0.85); 
+  --text-primary: #1c1c1e;
+  --text-secondary: #3c3c4399;
+  --btn-bg: #3880ff;
+  --btn-color: #ffffff;
+  --btn-hover: #2e6bdb;
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-shadow: rgba(0,0,0,0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #000000;
+    --bg-secondary: rgba(28,28,30,0.85);
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1a6;
+    --btn-bg: #0abde3;
+    --btn-color: #000000;
+    --btn-hover: #08a0c5;
+    --card-bg: rgba(44,44,46,0.9);
+    --card-shadow: rgba(0,0,0,0.4);
+  }
+}
+
+/* ==============================
+   Fondo y contenedor
+   ============================== */
+.register-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 450px;
+  background-color: var(--card-bg);
+  padding: 30px 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px var(--card-shadow);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ==============================
+   Inputs
+   ============================== */
+.register-card ion-input {
+  --background: var(--bg-secondary);
+  --padding-start: 12px;
+  --color: var(--text-primary);
+  --placeholder-color: var(--text-secondary);
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: all 0.2s ease-in-out;
+}
+
+.register-card ion-input:focus {
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+}
+
+/* ==============================
+   Botones
+   ============================== */
+.register-card ion-button {
+  --background: var(--btn-bg);
+  --color: var(--btn-color);
+  border-radius: 12px;
+  padding: 12px 0;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.register-card ion-button:hover {
+  --background: var(--btn-hover);
+  transform: scale(1.02);
+}
+
+/* ==============================
+   Links secundarios
+   ============================== */
+.register-card .secondary-link {
+  text-align: center;
+  color: var(--icon-color);
+  font-size: 0.9rem;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.register-card .secondary-link:hover {
+  color: var(--btn-hover);
+}
+
+/* ==============================
+   Título
+   ============================== */
+.register-card h2 {
+  text-align: center;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+/* ==============================
+   Mensajes de error
+   ============================== */
+.register-card .error-message {
+  color: #ff3b30;
+  font-size: 0.85rem;
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
