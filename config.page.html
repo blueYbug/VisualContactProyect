@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Configuración</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="config-page">
+
+  <!-- Avatar y bienvenida (igual que info page) -->
+  <div class="user-header" [ngStyle]="{'transform': 'scale(' + avatarScale + ')'}">
+    <ion-avatar
+      (mousedown)="onAvatarPressStart()"
+      (mouseup)="onAvatarPressEnd()"
+      (mouseleave)="onAvatarPressEnd()"
+      (touchstart)="onAvatarPressStart()"
+      (touchend)="onAvatarPressEnd()"
+      (click)="changeAvatar()">
+      <img [src]="user.photo || 'https://via.placeholder.com/150'" alt="Avatar usuario" />
+    </ion-avatar>
+    <h2>{{ user.name }}</h2>
+    <p class="welcome-msg">Bienvenido {{ user.name }}</p>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="action-buttons">
+    <ion-button expand="full" (click)="editProfile()">Editar perfil</ion-button>
+    <ion-button expand="full" (click)="changePassword()">Cambiar contraseña</ion-button>
+  </div>
+
+  <!-- Botón cerrar sesión -->
+  <ion-button class="logout-button" color="danger" expand="full" (click)="logout()">
+    Cerrar sesión
+  </ion-button>
+
+  <!-- Vista previa del avatar -->
+  <div class="avatar-preview" *ngIf="showAvatarPreview" (click)="closeAvatarPreview()">
+    <img [src]="avatarPreviewUrl" class="avatar-large" alt="Vista ampliada del avatar" />
+  </div>
+
+</ion-content>
