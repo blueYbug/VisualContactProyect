@@ -1,5 +1,5 @@
 /* ==============================
-Variables y modo claro/oscuro
+   Variables y modo claro/oscuro
    ============================== */
 :root {
   --bg-primary: #f2f2f7;
@@ -35,6 +35,7 @@ Variables y modo claro/oscuro
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   min-height: 100%;
   padding-bottom: 140px;
+  overflow: hidden; /* Evitar que los elementos se desborden */
 }
 
 /* ==============================
@@ -44,6 +45,7 @@ Variables y modo claro/oscuro
   text-align: center;
   margin-top: 30px;
   margin-bottom: 20px;
+  transition: transform 0.3s ease;
 }
 
 .user-header ion-avatar {
@@ -83,8 +85,8 @@ Variables y modo claro/oscuro
 
 .action-buttons ion-button,
 .logout-button {
-  --border-radius: 30px;
-  --background: linear-gradient(135deg, #007aff, #0051c7);
+  --border-radius: 50px; /* Bordes redondeados más suaves */
+  --background: linear-gradient(135deg, #007aff, #0051c7); /* Fondo degradado */
   --color: #fff;
   font-weight: 700;
   font-size: 1.1rem;
@@ -93,24 +95,26 @@ Variables y modo claro/oscuro
   max-width: 300px;
   margin: 15px auto;
   display: block;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); /* Sombra más suave */
   transition: all 0.3s ease;
   text-align: center;
+  border: none; /* Eliminamos el borde del botón */
+  background: var(--btn-bg); /* Fondo sólido */
 }
 
 /* Hover / foco */
 .action-buttons ion-button:hover,
 .logout-button:hover {
   filter: brightness(1.1);
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+  transform: translateY(-4px) scale(1.03); /* Desplazamiento más suave */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); /* Sombra más pronunciada al pasar el ratón */
 }
 
 /* Presionar */
 .action-buttons ion-button:active,
 .logout-button:active {
   transform: scale(0.95);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Efecto más sutil al presionar */
 }
 
 /* Iconos dentro de botones */
@@ -155,6 +159,20 @@ Variables y modo claro/oscuro
   border: 4px solid white;
   box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
   animation: zoomIn 0.3s ease;
+}
+
+/* ==============================
+   Fondo borroso al presionar el botón
+   ============================== */
+.blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(12px); /* Fondo borroso */
+  background-color: rgba(0, 0, 0, 0.2); /* Color oscuro para difuminar */
+  z-index: 9998; /* Asegurarnos de que el overlay esté detrás de los elementos */
 }
 
 /* ==============================
