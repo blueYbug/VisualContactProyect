@@ -6,52 +6,60 @@
 
 <ion-content class="teclado-page">
 
-  <!-- Pantalla que muestra el número ingresado -->
-  <div class="display-number">
-    <h2>{{ phoneNumber || ' ' }}</h2>
+  <!-- Display del número -->
+  <div class="display-number glass-card">
+    <h1>{{ phoneNumber || ' ' }}</h1>
   </div>
 
-  <!-- Contenedor absoluto del teclado + botones de acción -->
+  <!-- Contenedor del teclado -->
   <div class="teclado-container">
 
-    <!-- Teclado numérico -->
     <div class="keypad">
+
+      <!-- Cada fila -->
       <div class="key-row">
-        <button (click)="addNumber('1')">1</button>
-        <button (click)="addNumber('2')">2</button>
-        <button (click)="addNumber('3')">3</button>
+        <button class="key-btn" (click)="addNumber('1')"><span>1</span></button>
+        <button class="key-btn" (click)="addNumber('2')"><span>2</span></button>
+        <button class="key-btn" (click)="addNumber('3')"><span>3</span></button>
       </div>
+
       <div class="key-row">
-        <button (click)="addNumber('4')">4</button>
-        <button (click)="addNumber('5')">5</button>
-        <button (click)="addNumber('6')">6</button>
+        <button class="key-btn" (click)="addNumber('4')"><span>4</span></button>
+        <button class="key-btn" (click)="addNumber('5')"><span>5</span></button>
+        <button class="key-btn" (click)="addNumber('6')"><span>6</span></button>
       </div>
+
       <div class="key-row">
-        <button (click)="addNumber('7')">7</button>
-        <button (click)="addNumber('8')">8</button>
-        <button (click)="addNumber('9')">9</button>
+        <button class="key-btn" (click)="addNumber('7')"><span>7</span></button>
+        <button class="key-btn" (click)="addNumber('8')"><span>8</span></button>
+        <button class="key-btn" (click)="addNumber('9')"><span>9</span></button>
       </div>
+
       <div class="key-row">
-        <button (click)="addNumber('*')">*</button>
-        <button (click)="addNumber('0')">0</button>
-        <button (click)="addNumber('#')">#</button>
+        <button class="key-btn" (click)="addNumber('*')"><span>*</span></button>
+        <button class="key-btn" (click)="addNumber('0')"><span>0</span></button>
+        <button class="key-btn" (click)="addNumber('#')"><span>#</span></button>
       </div>
+
     </div>
 
-    <!-- Botones de acción: llamar centrado y borrar a la derecha -->
+    <!-- Botones acción -->
     <div class="action-row">
-      <button class="call-btn" (click)="makeCall()">
+
+      <button class="call-btn glass-card" (click)="makeCall()">
         <ion-icon name="call-outline"></ion-icon>
       </button>
 
-      <button class="delete-btn" (click)="deleteNumber()">
+      <button class="delete-btn glass-card" (click)="deleteNumber()">
         <ion-icon name="backspace-outline"></ion-icon>
       </button>
+
     </div>
 
   </div>
 
 </ion-content>
+
 
 <!-- ==============================
      Barra de navegación inferior

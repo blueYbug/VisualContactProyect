@@ -4,6 +4,7 @@ import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx';
 import { DatabaseService } from '../../service/database.service';
 import { NavController, ToastController } from '@ionic/angular';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { PhoneInfoService } from '../../service/phone-info.service';
 
 @Component({
   selector: 'app-teclado',
@@ -14,47 +15,87 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 export class TecladoPage implements OnInit {
 
   phoneNumber: string = '';
+  phoneInfo: any = null;
 
   constructor(
     private callNumber: CallNumber,
     private dbService: DatabaseService,
     private navCtrl: NavController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private phoneInfoService: PhoneInfoService
   ) {}
 
   async ngOnInit() {
     await this.dbService.initDB();
   }
 
-  // ===========================
-  // AGREGAR NÚMERO AL DISPLAY
-  // ===========================
+  // =========================================================
+  // Normalizar número → +56XXXXXXXXX
+  // =========================================================
+  normalizeNumber(num: string): string {
+    let clean = num.replace(/\s+/g, '');
+
+    if (clean.startsWith('+56')) return clean;
+    if (clean.startsWith('56')) return '+56' + clean.slice(2);
+    if (clean.startsWith('0')) return '+56' + clean.slice(1);
+
+    return '+56' + clean;
+  }
+
+  // =========================================================
+  // Agregar dígito
+  // =========================================================
   addNumber(num: string) {
     this.phoneNumber += num;
     Haptics.impact({ style: ImpactStyle.Light });
+    this.lookupInfo();
   }
 
-  // ===========================
-  // BORRAR ÚLTIMO DÍGITO
-  // ===========================
+  // =========================================================
+  // Borrar último dígito
+  // =========================================================
   deleteNumber() {
     if (this.phoneNumber.length > 0) {
       this.phoneNumber = this.phoneNumber.slice(0, -1);
       Haptics.impact({ style: ImpactStyle.Medium });
+      this.lookupInfo();
     }
   }
 
-  // ===========================
-  // VALIDAR NÚMERO
-  // ===========================
+  // =========================================================
+  // Consultar API automáticamente
+  // =========================================================
+  lookupInfo() {
+  if (this.phoneNumber.length < 7) {
+    this.phoneInfo = null;
+    return;
+  }
+
+  const normalized = this.normalizeNumber(this.phoneNumber);
+
+  this.phoneInfoService.getPhoneInfo(normalized).subscribe({
+    next: (data) => {
+      this.phoneInfo = data;
+      console.log('INFO DEL NÚMERO:', data);
+    },
+    error: () => {
+      this.phoneInfo = null;
+    }
+  });
+}
+
+
+  // =========================================================
+  // Validación
+  // =========================================================
   private isValidNumber(number: string): boolean {
     const regex = /^[0-9*#]+$/;
     return regex.test(number);
   }
 
-  // ===========================
-  // MOSTRAR TOAST DE ERROR
-  // ===========================
+  // =========================================================
+  // Toast
+  // =========================================================
   private async showToast(message: string) {
     const toast = await this.toastCtrl.create({
       message,
@@ -65,32 +106,40 @@ export class TecladoPage implements OnInit {
     await toast.present();
   }
 
-  // ===========================
-  // REALIZAR LLAMADA + GUARDAR LOG
-  // ===========================
+  // =========================================================
+  // Llamada + guardar log con info
+  // =========================================================
   async makeCall() {
-    Haptics.impact({ style: ImpactStyle.Light }); // Vibración al presionar llamar
+    Haptics.impact({ style: ImpactStyle.Light });
 
-    if (!this.phoneNumber || this.phoneNumber.trim() === '') {
+    if (!this.phoneNumber.trim()) {
       this.showToast('Ingrese un número válido');
       return;
     }
 
     if (!this.isValidNumber(this.phoneNumber)) {
-      this.showToast('El número solo puede contener dígitos, * o #');
+      this.showToast('Solo dígitos, * o #');
       return;
     }
 
+    const normalized = this.normalizeNumber(this.phoneNumber);
+
     try {
-      await this.callNumber.callNumber(this.phoneNumber, true);
-      console.log('Llamada iniciada a', this.phoneNumber);
+      await this.callNumber.callNumber(normalized, true);
 
-      await this.dbService.addCallLog(this.phoneNumber, 'call');
+      // Guardar log
+      const infoString = this.phoneInfo ? JSON.stringify(this.phoneInfo) : null;
 
-      // Limpiar display después de la llamada
+      await this.dbService.addCallLog(
+        normalized,
+        'call',
+        infoString
+      );
+
       this.phoneNumber = '';
+      this.phoneInfo = null;
+
     } catch (err) {
-      console.error('Error al realizar la llamada', err);
       this.showToast('No se pudo realizar la llamada');
     }
   }
