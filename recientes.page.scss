@@ -32,7 +32,7 @@
 }
 
 /* ==============================
-   Barra de navegación inferior unificada
+   Barra inferior (sin cambios)
    ============================== */
 .global-footer ion-toolbar {
   --background: var(--footer-bg);
@@ -106,10 +106,9 @@ ion-item-divider {
   border-radius: 12px;
   margin: 6px 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
   background-color: var(--bg-primary);
-  padding: 8px 12px;
+  padding: 12px 14px;
   transition: all 0.2s ease;
   box-shadow: 0 3px 12px var(--card-shadow);
 }
@@ -119,10 +118,11 @@ ion-item-divider {
   box-shadow: 0 6px 20px var(--card-shadow);
 }
 
-/* Icono de llamada */
+/* Icono */
 .call-icon {
   font-size: 24px;
   margin-right: 12px;
+  margin-top: 4px;
 }
 
 /* Textos */
@@ -134,26 +134,52 @@ ion-item-divider {
 
 .call-item ion-label p,
 .call-item ion-label small {
-  margin: 0;
+  margin: 2px 0;
   font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
-/* Tiempo de llamada */
+/* Tiempo */
 .call-time {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  text-align: right;
-  min-width: 50px;
+  margin-left: auto;
+  white-space: nowrap;
+  padding-left: 10px;
+}
+
+/* ==============================
+   INFO API (chips)
+   ============================== */
+.api-extra {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.api-extra ion-chip {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  font-size: 0.75rem;
+  height: 26px;
+  border-radius: 12px;
+}
+
+.api-extra ion-chip ion-icon {
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+/* ==============================
+   Skeleton Loader
+   ============================== */
+ion-skeleton-text {
+  border-radius: 12px;
+  margin: 4px 0;
 }
 
 /* Infinite scroll */
 ion-infinite-scroll-content {
   --color: var(--icon-color);
-}
-
-/* Skeleton Loader */
-ion-skeleton-text {
-  border-radius: 12px;
-  margin: 4px 0;
 }

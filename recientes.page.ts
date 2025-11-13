@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DatabaseService, CallLog } from '../../service/database.service';
 
-// Interfaz para agregar propiedades visuales a cada llamada
 interface DisplayCallRecord {
   contactName: string;
   phone: string;
@@ -9,9 +8,15 @@ interface DisplayCallRecord {
   type: 'incoming' | 'outgoing' | 'missed' | 'message';
   icon: string;
   color: string;
+
+  apiInfo?: {
+    location?: string;
+    carrier?: string;
+    line_type?: string;
+    country_name?: string;
+  };
 }
 
-// Para agrupar llamadas por día
 interface CallRecordByDay {
   dateLabel: string;
   logs: DisplayCallRecord[];
@@ -37,10 +42,15 @@ export class RecientesPage implements OnInit {
     this.loadCalls();
   }
 
+  // =========================================================
+  // Cargar registros
+  // =========================================================
   async loadCalls() {
     try {
       const callsFromDB: CallLog[] = await this.dbService.getAllCallLogs();
+
       this.allCalls = callsFromDB.map(c => this.convertDBCallToDisplayCall(c));
+
       this.groupCallsByDay();
     } catch (err) {
       console.error('Error cargando llamadas:', err);
@@ -49,6 +59,9 @@ export class RecientesPage implements OnInit {
     }
   }
 
+  // =========================================================
+  // Convertir registro BD → visual
+  // =========================================================
   private convertDBCallToDisplayCall(call: CallLog): DisplayCallRecord {
     let icon = '';
     let color = '';
@@ -67,20 +80,38 @@ export class RecientesPage implements OnInit {
         color = 'medium';
     }
 
+    let parsedInfo: any = null;
+    if (call.info) {
+      try {
+        parsedInfo = JSON.parse(call.info);
+      } catch {
+        parsedInfo = null;
+      }
+    }
+
     return {
       contactName: call.contact_name,
-      phone: '', // Puedes completar desde la tabla contactos si quieres
+      phone: parsedInfo?.international_format || parsedInfo?.number || '',
       time: new Date(call.timestamp),
       type: call.type === 'call' ? 'outgoing' : 'message',
       icon,
-      color
+      color,
+      apiInfo: {
+        location: parsedInfo?.location,
+        carrier: parsedInfo?.carrier,
+        line_type: parsedInfo?.line_type,
+        country_name: parsedInfo?.country_name
+      }
     };
   }
 
+  // =========================================================
+  // Agrupar por días
+  // =========================================================
   groupCallsByDay() {
     const grouped: { [key: string]: DisplayCallRecord[] } = {};
 
-    this.allCalls.forEach((call: DisplayCallRecord) => {
+    this.allCalls.forEach(call => {
       const dateStr = call.time.toLocaleDateString();
       if (!grouped[dateStr]) grouped[dateStr] = [];
       grouped[dateStr].push(call);
@@ -94,32 +125,38 @@ export class RecientesPage implements OnInit {
       }));
   }
 
+  // =========================================================
+  // Acciones
+  // =========================================================
   callAgain(call: DisplayCallRecord) {
-    console.log('Llamando de nuevo a', call.contactName || call.phone);
-    // Aquí podrías integrar un plugin de llamadas reales
+    console.log('Llamar de nuevo →', call.contactName || call.phone);
   }
 
   viewCallDetails(call: DisplayCallRecord) {
-    console.log('Detalles de llamada:', call);
-    // Aquí podrías abrir un modal con más información
+    console.log('Detalles completos:', call);
   }
 
   loadMore(event: any) {
     setTimeout(() => {
       event.target.complete();
-    }, 500);
+    }, 400);
   }
 
-  onScroll(event: any) {
-    // Animaciones o efectos al hacer scroll si quieres
-  }
+  onScroll(event: any) {}
 
+  // =========================================================
+  // Filtro
+  // =========================================================
   filtrarCalls(): DisplayCallRecord[] {
     if (!this.searchTerm) return this.allCalls;
+
     const term = this.searchTerm.toLowerCase();
+
     return this.allCalls.filter(c =>
-      (c.contactName && c.contactName.toLowerCase().includes(term)) ||
-      (c.phone && c.phone.includes(term))
+      (c.contactName?.toLowerCase().includes(term)) ||
+      (c.phone?.includes(term)) ||
+      (c.apiInfo?.carrier?.toLowerCase().includes(term)) ||
+      (c.apiInfo?.location?.toLowerCase().includes(term))
     );
   }
 

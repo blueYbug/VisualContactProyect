@@ -35,6 +35,7 @@
   <!-- Lista de llamadas -->
   <ion-list *ngIf="!isLoading" lines="none">
     <ng-container *ngFor="let day of callLogByDay">
+
       <!-- Separador de fecha -->
       <ion-item-divider sticky>
         {{ day.dateLabel }}
@@ -42,26 +43,58 @@
 
       <!-- Llamadas del día -->
       <ion-item-sliding *ngFor="let call of day.logs">
+
         <ion-item class="call-item" [ngClass]="call.type">
           <ion-icon slot="start" [name]="call.icon" [color]="call.color" class="call-icon"></ion-icon>
+
           <ion-label>
             <h3>{{ call.contactName || 'Desconocido' }}</h3>
             <p>{{ call.phone || 'Sin número' }}</p>
             <small>Tipo: {{ call.type }}</small>
+
+            <!-- INFO API -->
+            <div *ngIf="call.apiInfo" class="api-extra">
+
+              <ion-chip color="medium" outline *ngIf="call.apiInfo.carrier">
+                <ion-icon name="radio-outline"></ion-icon>
+                <ion-label>{{ call.apiInfo.carrier }}</ion-label>
+              </ion-chip>
+
+              <ion-chip color="primary" outline *ngIf="call.apiInfo.location">
+                <ion-icon name="location-outline"></ion-icon>
+                <ion-label>{{ call.apiInfo.location }}</ion-label>
+              </ion-chip>
+
+              <ion-chip color="secondary" outline *ngIf="call.apiInfo.country_name">
+                <ion-icon name="earth-outline"></ion-icon>
+                <ion-label>{{ call.apiInfo.country_name }}</ion-label>
+              </ion-chip>
+
+              <ion-chip color="tertiary" outline *ngIf="call.apiInfo.line_type">
+                <ion-icon name="call-outline"></ion-icon>
+                <ion-label>{{ call.apiInfo.line_type }}</ion-label>
+              </ion-chip>
+
+            </div>
+
           </ion-label>
+
           <div class="call-time">{{ call.time | date:'shortTime' }}</div>
         </ion-item>
 
-        <!-- Opciones rápidas al deslizar -->
+        <!-- Opciones rápidas -->
         <ion-item-options side="end">
           <ion-item-option color="success" (click)="callAgain(call)">
             <ion-icon slot="icon-only" name="call-outline"></ion-icon>
           </ion-item-option>
+
           <ion-item-option color="tertiary" (click)="viewCallDetails(call)">
             <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
           </ion-item-option>
         </ion-item-options>
+
       </ion-item-sliding>
+
     </ng-container>
   </ion-list>
 
@@ -75,9 +108,7 @@
 
 </ion-content>
 
-<!-- ==============================
-     Barra de navegación inferior
-     ============================== -->
+<!-- Barra inferior -->
 <ion-footer>
   <ion-toolbar>
     <ion-grid>
