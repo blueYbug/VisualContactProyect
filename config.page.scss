@@ -35,7 +35,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   min-height: 100%;
   padding-bottom: 140px;
-  overflow: hidden; /* Evitar que los elementos se desborden */
+  overflow: hidden;
 }
 
 /* ==============================
@@ -85,8 +85,8 @@
 
 .action-buttons ion-button,
 .logout-button {
-  --border-radius: 50px; /* Bordes redondeados más suaves */
-  --background: linear-gradient(135deg, #007aff, #0051c7); /* Fondo degradado */
+  --border-radius: 50px;
+  --background: linear-gradient(135deg, #007aff, #0051c7);
   --color: #fff;
   font-weight: 700;
   font-size: 1.1rem;
@@ -95,26 +95,25 @@
   max-width: 300px;
   margin: 15px auto;
   display: block;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); /* Sombra más suave */
-  transition: all 0.3s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
   text-align: center;
-  border: none; /* Eliminamos el borde del botón */
-  background: var(--btn-bg); /* Fondo sólido */
+  border: none;
+  background: var(--btn-bg);
 }
 
 /* Hover / foco */
 .action-buttons ion-button:hover,
 .logout-button:hover {
   filter: brightness(1.1);
-  transform: translateY(-4px) scale(1.03); /* Desplazamiento más suave */
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); /* Sombra más pronunciada al pasar el ratón */
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
 /* Presionar */
 .action-buttons ion-button:active,
 .logout-button:active {
   transform: scale(0.95);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Efecto más sutil al presionar */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Iconos dentro de botones */
@@ -162,7 +161,7 @@
 }
 
 /* ==============================
-   Fondo borroso al presionar el botón
+   Overlay para mostrar contraseña
    ============================== */
 .blur-overlay {
   position: fixed;
@@ -170,24 +169,162 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  backdrop-filter: blur(12px); /* Fondo borroso */
-  background-color: rgba(0, 0, 0, 0.2); /* Color oscuro para difuminar */
-  z-index: 9998; /* Asegurarnos de que el overlay esté detrás de los elementos */
+  backdrop-filter: blur(15px) brightness(0.7); /* fondo borroso y oscuro */
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  animation: fadeInOverlay 0.4s ease forwards;
+}
+
+.password-display {
+  padding: 30px 40px;
+  background: rgba(255, 255, 255, 0.95); /* semitransparente blanca */
+  color: var(--text-primary);
+  font-size: 2rem; /* tamaño grande pero proporcional */
+  font-weight: 700;
+  border-radius: 25px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  text-align: center;
+  word-break: break-all;
+  max-width: 90%;
+  min-width: 300px;
+  transform: scale(0.7);
+  opacity: 0;
+  animation: zoomFadeIn 0.5s ease forwards;
+}
+
+.password-display .password-text {
+  font-size: 2.5rem; /* tamaño ligeramente más grande para la contraseña */
+  color: #000; /* negro para mejor contraste */
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+}
+
+.password-display .countdown {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #555; /* gris oscuro más legible */
 }
 
 /* ==============================
    Animaciones
    ============================== */
-@keyframes zoomIn {
-  from { transform: scale(0.6); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+@keyframes zoomFadeIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes fadeIn {
+@keyframes fadeInOverlay {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+/* Transiciones suaves */
 * {
   transition: all 0.25s ease-in-out;
+}
+
+
+
+/* ==============================
+   Botón Ver Contraseña
+   ============================== */
+.show-password-button {
+  --border-radius: 50px;
+  --background: linear-gradient(135deg, #007aff, #0051c7);
+  --color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 14px 20px;
+  width: 100%;
+  max-width: 300px;
+  margin: 15px auto;
+  display: block;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.show-password-button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.show-password-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.show-password-button ion-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+  vertical-align: middle;
+}
+
+.show-password-button .button-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+/* ==============================
+   Estilo para la flecha de regresar solo icono
+   ============================== */
+ion-toolbar ion-back-button.icon-only-back {
+  --background: transparent; /* Sin fondo */
+  --border-radius: 0;        /* Sin bordes redondeados */
+  --box-shadow: none;        /* Sin sombra */
+  --color: var(--btn-bg);    /* Color del icono según modo */
+  width: auto;               /* Se ajusta al contenido */
+  height: auto;
+  padding: 0;                /* Quitar padding extra */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10px;         /* Separación del borde */
+  transition: all 0.3s ease;
+}
+
+/* Hover y presionar */
+ion-toolbar ion-back-button.icon-only-back:hover {
+  filter: brightness(1.2);
+  transform: scale(1.15);
+}
+
+ion-toolbar ion-back-button.icon-only-back:active {
+  transform: scale(0.95);
+}
+
+/* Icono interno */
+ion-toolbar ion-back-button.icon-only-back ion-icon {
+  font-size: 28px;              /* Tamaño del icono */
+  transition: transform 0.2s ease, color 0.2s ease;
+  color: var(--btn-bg);         /* Color adaptable según modo */
+}
+
+ion-toolbar ion-back-button.icon-only-back:hover ion-icon {
+  transform: scale(1.2) rotate(10deg);
+}
+
+ion-toolbar ion-back-button.icon-only-back:active ion-icon {
+  transform: scale(0.95);
+}
+
+/* ==============================
+   Modo oscuro
+   ============================== */
+@media (prefers-color-scheme: dark) {
+  ion-toolbar ion-back-button.icon-only-back {
+    --color: var(--btn-bg); /* Usamos la variable de color adaptativa */
+  }
+
+  ion-toolbar ion-back-button.icon-only-back ion-icon {
+    color: var(--btn-bg);
+  }
 }

@@ -1,12 +1,15 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Configuración</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/" class="icon-only-back"></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="config-page">
 
-  <!-- Avatar y bienvenida (igual que info page) -->
+  <!-- Avatar y bienvenida -->
   <div class="user-header" [ngStyle]="{'transform': 'scale(' + avatarScale + ')'}">
     <ion-avatar
       (mousedown)="onAvatarPressStart()"
@@ -25,6 +28,9 @@
   <div class="action-buttons">
     <ion-button expand="full" (click)="editProfile()">Editar perfil</ion-button>
     <ion-button expand="full" (click)="changePassword()">Cambiar contraseña</ion-button>
+    <ion-button expand="full" (click)="showPassword()">Ver contraseña</ion-button>
+    <ion-button expand="full" (click)="syncContacts()">Guardar / Cargar Contactos</ion-button>
+
   </div>
 
   <!-- Botón cerrar sesión -->
@@ -35,6 +41,14 @@
   <!-- Vista previa del avatar -->
   <div class="avatar-preview" *ngIf="showAvatarPreview" (click)="closeAvatarPreview()">
     <img [src]="avatarPreviewUrl" class="avatar-large" alt="Vista ampliada del avatar" />
+  </div>
+
+  <!-- Overlay para mostrar contraseña temporalmente -->
+  <div *ngIf="showPasswordOverlay" class="blur-overlay">
+    <div class="password-display">
+      <div class="password-text">{{ revealedPassword }}</div>
+      <div class="countdown">Se ocultará en {{ countdown }}s</div>
+    </div>
   </div>
 
 </ion-content>
