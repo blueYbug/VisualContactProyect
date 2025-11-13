@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>404 — Página no encontrada</title>
+  <meta name="description" content="Página 404 personalizada. La página solicitada no existe." />
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card: rgba(255,255,255,0.05);
+      --glass: rgba(255,255,255,0.06);
+      --accent: linear-gradient(135deg,#7c3aed,#06b6d4);
+      --text:#e6eef8;
+      --muted: rgba(230,238,248,0.7);
+      --shadow: 0 10px 30px rgba(2,6,23,0.6);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 20%, rgba(124,58,237,0.12), transparent),
+                  radial-gradient(900px 400px at 90% 80%, rgba(6,182,212,0.08), transparent),
+                  var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+    }
+
+    .container{
+      width:100%;
+      max-width:1100px;
+      display:grid;
+      gap:24px;
+      grid-template-columns: 1fr 420px;
+      align-items:center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:18px;
+      padding:36px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(6px) saturate(120%);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    /* Responsive: single column on small screens */
+    @media (max-width:880px){
+      .container{grid-template-columns:1fr; padding:28px}
+      .art{order:-1}
+    }
+
+    .hero{
+      padding:12px 18px;
+    }
+    h1{
+      font-size:clamp(36px,6vw,56px);
+      line-height:1;
+      margin:0 0 8px 0;
+      letter-spacing:-1px;
+      background:var(--accent);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    p.lead{
+      margin:0 0 22px 0;
+      color:var(--muted);
+      font-size:16px;
+    }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      appearance:none;
+      border:0;
+      padding:12px 18px;
+      font-weight:600;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.45);
+      transition:transform .18s ease, box-shadow .18s ease, opacity .12s;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .btn:active{transform:translateY(1px)}
+
+    .btn-primary{
+      background:var(--accent);
+      color:white;
+      padding-left:16px;
+      padding-right:20px;
+    }
+    .btn-ghost{
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.06);
+      color:var(--muted);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Artwork card */
+    .art{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      border-radius:14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .scene{
+      width:100%;
+      max-width:360px;
+      aspect-ratio:1.1/1;
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+
+    /* Floating card inside artwork */
+    .orb{
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background: conic-gradient(from 180deg at 50% 50%, rgba(124,58,237,0.28), rgba(6,182,212,0.18));
+      display:grid;
+      place-items:center;
+      filter: blur(6px);
+      transform: scale(0.98);
+      animation: float 6s ease-in-out infinite;
+      position:absolute;
+      z-index:0;
+    }
+    @keyframes float{
+      0%{transform:translateY(0) scale(0.98)}
+      50%{transform:translateY(-14px) scale(1.02)}
+      100%{transform:translateY(0) scale(0.98)}
+    }
+
+    .paper{
+      position:relative;
+      z-index:2;
+      width:260px;
+      padding:20px;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 10px 40px rgba(2,6,23,0.5), inset 0 1px 0 rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.04);
+      text-align:center;
+      backdrop-filter: blur(8px) saturate(120%);
+    }
+    .code{
+      font-weight:800;
+      font-size:42px;
+      letter-spacing:2px;
+      margin-bottom:6px;
+      color:transparent;
+      background: linear-gradient(90deg,#ffffff,#cbd5e1);
+      -webkit-background-clip:text;
+      background-clip:text;
+    }
+    .msg{color:var(--muted); font-size:14px}
+
+    .search{
+      margin-top:16px;
+      display:flex;
+      gap:8px;
+    }
+    .search input{
+      flex:1;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.04);
+      background:transparent;
+      color:var(--text);
+      outline:none;
+    }
+
+    footer.note{
+      margin-top:18px;
+      color:rgba(230,238,248,0.45);
+      font-size:13px;
+    }
+
+    /* small decorative dots */
+    .dots{position:absolute;inset:0;pointer-events:none}
+    .dot{width:6px;height:6px;border-radius:6px;background:rgba(255,255,255,0.03);position:absolute}
+
+  </style>
+</head>
+<body>
+  <main class="container" role="main">
+    <h1>404 — Página no encontrada</h1>
+    <p>La página que buscas no existe o ha sido movida.</p>
+  </main>
+
+  <script>
+    // Botones y búsqueda mínima (sin servidor)
+    document.getElementById('goHome').addEventListener('click', ()=>{ window.location.href = '/'; });
+    document.getElementById('goBack').addEventListener('click', ()=>{ history.length>1?history.back():window.location.href='/'; });
+    document.getElementById('searchBtn').addEventListener('click', ()=>{ const q=document.getElementById('q').value.trim(); if(!q) { document.getElementById('q').focus(); return; } window.location.href = '/search?q=' + encodeURIComponent(q); });
+
+    // Mejora: si provienes de una ruta mal escrita, intentamos sugerir la ruta padre en la consola (útil para devs)
+    (function(){
+      try{
+        const path = location.pathname.replace(/\/+$/,'');
+        if(path && path.split('/').length>2){
+          const parent = path.split('/').slice(0,-1).join('/') || '/';
+          console.info('Sugerencia: quizás quería ir a', parent);
+        }
+      }catch(e){}
+    })();
+  </script>
+</body>
+</html>
